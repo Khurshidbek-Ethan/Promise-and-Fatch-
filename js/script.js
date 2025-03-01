@@ -188,8 +188,9 @@
 ////////// ---------------------
 const postWrapper = document.querySelector('.posts')
 //  GET METHOD
+const OUR_URL = 'https://jsonplaceholder.typicode.com/posts'
 window.addEventListener('DOMContentLoaded', () => {
-	fetch('https://jsonplaceholder.typicode.com/posts', {
+	fetch(OUR_URL, {
 		method: 'GET',
 		headers: { 'Content-Type': 'application/json' },
 	})
@@ -211,7 +212,41 @@ window.addEventListener('DOMContentLoaded', () => {
 			errorEl.textContent = 'Somthing went wrong'
 			postWrapper.append(errorEl)
 		})
-		.finally(() => {
-			console.log('Finaly')
+
+	// METHOD POST
+	const form = document.querySelector('form')
+	form.addEventListener('submit', event => {
+		event.preventDefault()
+		const formData = new FormData(form)
+		// console.log(formData)
+		const object = {}
+		formData.forEach((value, key) => {
+			object[key] = value
 		})
+		console.log(object) // bu yerda objectni key bn vakuesini oldim
+		const json = JSON.stringify(object)
+		// console.log(json)
+		fetch(OUR_URL, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			// jsonni yuborish un body kerak/ bodyga jsonni yuboramiz yanni serverimizni body qismiga
+			body: json,
+		})
+			.then(res => res.json())
+			.then(data => {
+				console.log('data', data)
+
+				form.reset()
+				const post = document.createElement('div')
+				post.classList.add('post')
+				post.innerHTML += `
+  <h4> <b>${data.id}.</b> ${data.title}</h4>
+			<p>${data.body}</p>
+			`
+				postWrapper.append(post)
+			})
+			.catch(err => {
+				console.log(err)
+			})
+	})
 })
